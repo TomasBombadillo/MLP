@@ -36,12 +36,11 @@ class perceptron(object):
 			# Xavier initialization
 			#------------------------
 			# usually work, but sometimes stay in error=1 and doesn't move anywhere
-
-			#sigma = np.sqrt(2./(self.layer[i-1]+self.layer[i]))
-			#W.append( np.array(np.random.normal(0,sigma,(self.layer[i-1],self.layer[i]))) )
+			sigma = np.sqrt(2./(self.layer[i-1]+self.layer[i]))
+			W.append( np.array(np.random.normal(0.5,sigma,(self.layer[i-1],self.layer[i]))) )
 
 			# Create random matrices with dimensions specified
-			W.append( np.array(np.random.random( (self.layer[i-1],self.layer[i]) )) )
+			#W.append( np.array(np.random.random( (self.layer[i-1],self.layer[i]) )) )
 			B.append( np.zeros((1,self.layer[i])) )
 
 			delta.append( np.zeros((1,self.layer[i])) )
@@ -53,7 +52,19 @@ class perceptron(object):
 		self.delta = delta
 		self.Delta = Delta
 
-	def Work(self, X): # evaluates the entries through all network and return result
+	def sigmoid(self,X):
+		return 1/(1+np.exp(-X))
+
+	def J(self,Y_pred,Y):
+		#print("\n-----substraction-----\n",(Y_pred-Y))
+		#print("--------prod--------\n",(Y_pred-Y)*(Y_pred-Y))
+		#print("--------sum--------\n", np.sum((Y-Y_pred)*(Y-Y_pred)))
+		return np.sum((Y-Y_pred)*(Y-Y_pred)) / len(Y)
+
+	def binary_J(self,Y_pred,Y):
+		return -1.*np.sum( Y*np.log(self.sigmoid(Y_pred)) + (1.-Y)*np.log(1.-self.sigmoid(Y_pred)) ) / len(Y)
+
+	def Work(self, X, alpha=1): # evaluates the entries through all network and return result
 		try:
 			self.X
 			self.Z
@@ -61,11 +72,11 @@ class perceptron(object):
 			self.X = []
 			self.Z = [[]]
 
-		self.X.append( np.array([X]) )
+		self.X.append( np.array(X) )
 		for i in range(1,self.n_layers+1):
 			# Evaluates the result of the past layer ands send it to the next one
-			Z = np.array([(np.dot(X,self.W[i]) + self.B[i]).reshape(-1)])
-			X = np.vectorize(self.f)( Z )
+			Z = np.array([(np.dot(X,self.W[i]) + self.B[i]).reshape(-1)]).reshape( (X.shape[0],self.B[i].shape[1]) )
+			X = np.vectorize(self.f[i-1])( alpha*Z )
 
 			#saves values for back-propagation
 			self.Z.append( Z )
@@ -73,22 +84,26 @@ class perceptron(object):
 
 		return X
 
-	def Train(self, X, Y, learn_rate=0.001, epochs=10000):
+	def Train(self, X, Y, learn_rate=0.01, alpha=1, epochs=10000):
 		errors = np.array([])
 
-		Y_pred = self.Work(X)
-		J = np.sum(Y_pred-Y)**2 /len(Y)
+		Y_pred = self.Work(X,alpha)
+		J = self.J(Y_pred,Y)
+		print("Initial Error: \t",J*100) 
 		errors = np.append(errors,J)
 
 		epsilon = 1e-5
 		i=0
-		while J > epsilon and i<epochs:
+		step=epochs/100.
+		#while J > epsilon and i<epochs:
+		while i<epochs:
 			i+=1
 			self.delta[-1] = (self.X[-1]-Y)/ len(Y)
+			#self.delta[-1] = ( self.sigmoid(Y_pred)-Y )
 			for j in range(self.n_layers):
 				l = self.n_layers-j
 
-				self.Delta[l] = self.delta[l] * np.vectorize(self.df)(self.Z[l])
+				self.Delta[l] = self.delta[l] * np.vectorize(self.df[l-1])(alpha*self.Z[l])
 				self.delta[l-1] = np.dot(self.Delta[l],self.W[l].T)
 
 			for j in range(self.n_layers):
@@ -100,17 +115,17 @@ class perceptron(object):
 				self.W[l] -= learn_rate*gradW
 				self.B[l] -= learn_rate*gradB
 
-			if i%100==0:
-				Y_pred = self.Work(X)
-				J = np.sum(Y_pred-Y)**2 /len(Y)
-				print("iter: ",i,"Value:\t",Y_pred,"Error:\t",J*100)
+			if i%step==0:
+				Y_pred = self.Work(X,alpha)
+				J = self.J(Y_pred,Y)
+				print("iter: ",i,"Value:\n",Y_pred,"Error:\t",J*100)
 				errors = np.append(errors,J)
 
-		Y_pred = self.Work(X)
-		J = np.sum(Y_pred-Y)**2 /len(Y)
-		print("Value:\t",Y_pred,"Error:\t",J*100)
+		Y_pred = self.Work(X,alpha)
+		J = self.J(Y_pred,Y)
+		print("Value:\n",Y_pred,"\nError:\t",J*100)
 
-		plt.plot(np.linspace(0,len(errors)*100,len(errors)),errors)
+		plt.plot(np.linspace(0,len(errors)*step,len(errors)),errors, ".")
 		plt.show()
 		plt.close()
 		return J
