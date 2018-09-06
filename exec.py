@@ -71,6 +71,6 @@ Y = np.array([[0],[1],[1],[0]])
 print("Initial value:\n",P.Work(X))
 
 # Training
-P.Train(X,Y,learn_rate = 2.,epochs=100000)
+P.Train(X,Y,learn_rate = 1.,epochs=100000)
 
 print("Final value:\n",P.Work(X))
