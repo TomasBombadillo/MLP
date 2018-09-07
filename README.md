@@ -13,9 +13,9 @@ python exec.py
 ```
 Al instante empezaráa mostrar los resultados del entrenamiento, es decir la época, la rata de aprendizaje y el porcentaje de error.
 Al acabar, ya sea porque corrió el número máximo de épocas o porque el error de entrenamiento llegó por debajo de 10^(-10), se mostrará una gráfica que ilustra el cambio del error mientras corrían las épocas, al cerrar la gráfica, se mostrará el resultado final, es decir el vector de salida, que idealmente debe ser el siguiente:
-$$\begin{bmatrix} 0  \\ 1 \\ 1 \\0 \end{bmatrix}$$
 
-![alt text](MLP/y-resultado.png)
+![resultado ideal](https://github.com/TomasBombadillo/MLP/blob/master/y-resultado.png)
+
 pero muy pocas veces da esto exactamente.
 ### Nota
 Puede que el programa logre entrenar el XOR exitosamente a la primera ejecución, pero puede darse el caso que no lo haga en las primeras iteraciones, en este caso es necesario ejecutarlo hasta que funcione, debería completar un entrenamiento exitoso en los primeros 5 intentos.
