@@ -19,3 +19,11 @@ Al acabar, ya sea porque corrió el número máximo de épocas o porque el error
 pero muy pocas veces da esto exactamente.
 ### Nota
 Puede que el programa logre entrenar el XOR exitosamente a la primera ejecución, pero puede darse el caso que no lo haga en las primeras iteraciones, en este caso es necesario ejecutarlo hasta que funcione, debería completar un entrenamiento exitoso en los primeros 5 intentos.
+
+## Autor
+
+* **Tomás Londoño** - *programa completo* - [TomasBombadillo](https://github.com/TomasBombadillo)
+
+## License
+
+This project is licensed under The GNU General Public License - see the [LICENSE](LICENSE) file for details
